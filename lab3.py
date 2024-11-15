@@ -151,26 +151,30 @@ else:
 
 
 chosen_plane = input("Select a plane: xy: 0 | yz: 1 | zx: 2: ")
-third_axis_value = input("Select the position of the chosen plane in the third axis: ")
+third_axis_value = int(input("Select the position of the chosen plane in the third axis: "))
+print("Select the center point for the 3D graphic: ")
+graphic_3d_center_x = int(input("x: "))
+graphic_3d_center_y = int(input("y: "))
+graphic_3d_center_z = int(input("z: "))
 
 if chosen_plane == "0":
-    first_axis = X[:,:,int(third_axis_value) + zero_index]
-    second_axis = Y[:,:,int(third_axis_value) + zero_index]
-    first_axis_field_components = Bx[:,:,int(third_axis_value) + zero_index]
-    second_axis_field_components = By[:,:,int(third_axis_value) + zero_index]
-    conductors_mask = conductores[:,:,int(third_axis_value) + zero_index]
+    first_axis = X[:,:,third_axis_value + zero_index]
+    second_axis = Y[:,:,third_axis_value + zero_index]
+    first_axis_field_components = Bx[:,:,third_axis_value + zero_index]
+    second_axis_field_components = By[:,:,third_axis_value + zero_index]
+    conductors_mask = conductores[:,:,third_axis_value + zero_index]
 elif chosen_plane == "1":
-    first_axis = numpy.transpose(Y[:,int(third_axis_value) + zero_index,:])
-    second_axis = numpy.transpose(Z[:,int(third_axis_value) + zero_index,:])
-    first_axis_field_components = numpy.transpose(By[:,int(third_axis_value) + zero_index,:])
-    second_axis_field_components = numpy.transpose(Bz[:,int(third_axis_value) + zero_index,:])
-    conductors_mask = numpy.transpose(conductores[:,int(third_axis_value) + zero_index,:])
+    first_axis = numpy.transpose(Y[:,third_axis_value + zero_index,:])
+    second_axis = numpy.transpose(Z[:,third_axis_value + zero_index,:])
+    first_axis_field_components = numpy.transpose(By[:,third_axis_value + zero_index,:])
+    second_axis_field_components = numpy.transpose(Bz[:,third_axis_value + zero_index,:])
+    conductors_mask = numpy.transpose(conductores[:,third_axis_value + zero_index,:])
 elif chosen_plane == "2":
-    first_axis = Z[int(third_axis_value) + zero_index,:,:]
-    second_axis = X[int(third_axis_value) + zero_index,:,:]
-    first_axis_field_components = Bz[int(third_axis_value) + zero_index,:,:]
-    second_axis_field_components = Bx[int(third_axis_value) + zero_index,:,:]
-    conductors_mask = conductores[int(third_axis_value) + zero_index,:,:]
+    first_axis = Z[third_axis_value + zero_index,:,:]
+    second_axis = X[third_axis_value + zero_index,:,:]
+    first_axis_field_components = Bz[third_axis_value + zero_index,:,:]
+    second_axis_field_components = Bx[third_axis_value + zero_index,:,:]
+    conductors_mask = conductores[third_axis_value + zero_index,:,:]
 else:
     quit()
 
@@ -180,6 +184,7 @@ plane_field_magnitude = numpy.sqrt(numpy.square(first_axis_field_components) + n
 
 fig = matplotlib.figure(figsize=matplotlib.figaspect(0.4))
 
+fig3d, ax3d = matplotlib.subplots(subplot_kw={"projection": "3d"})
 
 ax = fig.add_subplot(1, 2, 1)
 
@@ -190,8 +195,16 @@ ax.set_xlim(- (size - 1) / 2, (size - 1) / 2)
 ax.set_ylim(- (size - 1) / 2, (size - 1) / 2)
 
 
-ax3d = fig.add_subplot(1, 2, 2, projection='3d')
-surf = ax3d.plot_surface(first_axis, second_axis, plane_field_magnitude, cmap='Blues', linewidth=0, antialiased=True)
+ax_surface = fig.add_subplot(1, 2, 2, projection='3d')
+surf = ax_surface.plot_surface(first_axis, second_axis, plane_field_magnitude, cmap='Blues', linewidth=0, antialiased=True)
+
+
+
+graphic_3d_mask = numpy.zeros_like(X, dtype=bool)
+graphic_3d_mask[zero_index + graphic_3d_center_y - 5 : zero_index + graphic_3d_center_y + 5,
+                zero_index + graphic_3d_center_x - 5 : zero_index + graphic_3d_center_x + 5,
+                zero_index + graphic_3d_center_z - 5 : zero_index + graphic_3d_center_z + 5] = True
+ax3d.quiver(X[graphic_3d_mask], Y[graphic_3d_mask], Z[graphic_3d_mask], Bx[graphic_3d_mask], By[graphic_3d_mask], Bz[graphic_3d_mask], normalize=True, length=0.5)
 
 
 # Datos extra para el grafico 1
@@ -205,22 +218,27 @@ elif chosen_plane == "1":
 elif chosen_plane == "2":
     ax.set_xlabel('z [m]')
     ax.set_ylabel('x [m]')
-fig.colorbar(surf, ax=ax3d, orientation='vertical', label='Magnetic Field Magnitude [T]')
+fig.colorbar(surf, ax=ax_surface, orientation='vertical', label='Magnetic Field Magnitude [T]')
 
 # Datos extra para el grafico 2
-ax3d.set_title('Magnetic Field Surface')
+ax_surface.set_title('Magnetic Field Surface')
 if chosen_plane == "0":
-    ax3d.set_xlabel('x [m]')
-    ax3d.set_ylabel('y [m]')
-    ax3d.set_zlabel('|Bxy| [T]')
+    ax_surface.set_xlabel('x [m]')
+    ax_surface.set_ylabel('y [m]')
+    ax_surface.set_zlabel('|Bxy| [T]')
 if chosen_plane == "1":
-    ax3d.set_xlabel('y [m]')
-    ax3d.set_ylabel('z [m]')
-    ax3d.set_zlabel('|Byz| [T]')
+    ax_surface.set_xlabel('y [m]')
+    ax_surface.set_ylabel('z [m]')
+    ax_surface.set_zlabel('|Byz| [T]')
 if chosen_plane == "2":
-    ax3d.set_xlabel('z [m]')
-    ax3d.set_ylabel('x [m]')
-    ax3d.set_zlabel('|Bzx| [T]')
+    ax_surface.set_xlabel('z [m]')
+    ax_surface.set_ylabel('x [m]')
+    ax_surface.set_zlabel('|Bzx| [T]')
+
+
+ax3d.set_xlabel('x [m]')
+ax3d.set_ylabel('y [m]')
+ax3d.set_zlabel('z [m]')
 
 
 matplotlib.tight_layout()
