@@ -157,6 +157,18 @@ graphic_3d_center_x = int(input("x: "))
 graphic_3d_center_y = int(input("y: "))
 graphic_3d_center_z = int(input("z: "))
 
+
+print("Select a point to calculate the magnetic field vector: ")
+point_x = int(input("x: "))
+point_y = int(input("y: "))
+point_z = int(input("z: "))
+
+x_value = Bx[zero_index + point_y][zero_index + point_x][zero_index + point_z]
+y_value = By[zero_index + point_y][zero_index + point_x][zero_index + point_z]
+z_value = Bz[zero_index + point_y][zero_index + point_x][zero_index + point_z]
+
+print(f"Field in ({point_x}, {point_y}, {point_z}) is: ({x_value})i + ({y_value})j + ({z_value})k")
+
 if chosen_plane == "0":
     first_axis = X[:,:,third_axis_value + zero_index]
     second_axis = Y[:,:,third_axis_value + zero_index]
