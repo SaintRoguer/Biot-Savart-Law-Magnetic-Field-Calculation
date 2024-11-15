@@ -2,7 +2,7 @@ import numpy as numpy
 import matplotlib.pyplot as matplotlib
 
 
-km = 10^-7
+km = 10**(-7)
 
 size = 81
 zero_index = int((size - 1) / 2)
@@ -99,7 +99,7 @@ def generar_bobina_helmholtz(nro_diferenciales, corriente, radio):
         I[j][i][k2] = corriente
 
 
-""" generar_recta(10, 81) """
+generar_recta(10, 81)
 """ generar_espira(50, 15, 15) """
 """ generar_solenoide(200, 10, 15, 41, 8) """
 """ generar_bobina_helmholtz(50, 20, 15) """
