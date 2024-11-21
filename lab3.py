@@ -98,7 +98,6 @@ def generar_bobina_helmholtz(nro_diferenciales, corriente, radio):
         i = round(x) + zero_index
         j = round(y) + zero_index
         
-
         Dx[j][i][k1] += -y / radio * magnitud_diferencial
         Dy[j][i][k1] += x / radio * magnitud_diferencial
         I[j][i][k1] = corriente
@@ -114,7 +113,7 @@ def generar_bobina_helmholtz(nro_diferenciales, corriente, radio):
 
 # llamadas a funciones para la generacion de la configuracion de conductores deseada
 generar_recta(10, 81)
-generar_espira(50, 15, 15)
+""" generar_espira(50, 15, 15) """
 """ generar_solenoide(200, 10, 15, 41, 8) """
 """ generar_bobina_helmholtz(50, 20, 15) """
 
@@ -136,13 +135,12 @@ def add_magnetic_field_diferential(i, j, k):
     dist_z = Z - (k - zero_index)
     r = numpy.sqrt(dist_x**2 + dist_y**2 + dist_z**2)
 
-    r[r == 0] = numpy.inf
+    with numpy.errstate(divide='ignore', invalid='ignore'):
+        k = km * corriente / r**3
 
-    k = km * corriente / r**3
-
-    Bx += k * (dy * dist_z - dz * dist_y)
-    By += k * (dz * dist_x - dx * dist_z)
-    Bz += k * (dx * dist_y - dy * dist_x)
+        Bx += k * (dy * dist_z - dz * dist_y)
+        By += k * (dz * dist_x - dx * dist_z)
+        Bz += k * (dx * dist_y - dy * dist_x)
 
 
 # variable para seleccionar si se quiere calcular el campo, o usar el campo guardado en la ultima ejecucion del programa
@@ -257,7 +255,7 @@ elif chosen_plane == "1":
 elif chosen_plane == "2":
     ax.set_xlabel('z [m]')
     ax.set_ylabel('x [m]')
-fig.colorbar(surf, ax=ax_surface, orientation='vertical', label='Magnetic Field Magnitude [T]')
+fig.colorbar(surf, ax=ax_surface, orientation='vertical', label='Magnetic Field Magnitude [T]', pad=0.1)
 ax.set_xlim(- (size - 1) / 2, (size - 1) / 2)
 ax.set_ylim(- (size - 1) / 2, (size - 1) / 2)
 
